@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
-import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -19,12 +17,10 @@ import com.example.newsapp.repository.NewsRepository
 import com.example.newsapp.data.local.sharedPref.SharedPreferencesManager
 import com.example.newsapp.ui.adapter.NewsAdapter
 import com.example.newsapp.ui.adapter.OnArticleClickListener
-import com.example.newsapp.util.Constants.Companion.QUERY_PAGE_SIZE
 import com.example.newsapp.util.Resource
 import com.example.newsapp.viewModel.NewViewModelProviderFactory
 import com.example.newsapp.viewModel.NewsViewModel
 import com.google.android.material.snackbar.Snackbar
-import java.util.Objects
 
 class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListener {
     private lateinit var newsAdapter: NewsAdapter
@@ -91,7 +87,6 @@ class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListen
         newsRecyclerView.apply {
             adapter = newsAdapter
             layoutManager = LinearLayoutManager(activity) //
-            addOnScrollListener(this@BreakingNewsFragment.scrollListener)
         }
 
     }
