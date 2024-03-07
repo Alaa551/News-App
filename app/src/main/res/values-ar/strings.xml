@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language" >اللغة</string>
+    <string name="mode" >الوضع</string>
+    <string name="english" >اللغة الانجليزية</string>
+    <string name="arabic" >اللغة العربية</string>
+    <string name="lightMode" >الوضع المضئ</string>
+    <string name="darkMode" >الوضع الليلي</string>
+    <string name="choose_country_of_news">اختر البلد التي تريد الأخبار عنها</string>
+    <string name="choose_category_of_news">اختر المجال الذي تريده للأخبار</string>
+    <string name="choose_lang_of_news">اختر اللغة التي تريدها للأخبار</string>
+    <string name="see_all">رؤية الكل</string>
+</resources>
