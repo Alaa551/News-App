@@ -102,8 +102,8 @@ class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListen
         return NewViewModelProviderFactory(
             requireActivity().application,
             newsRepository,
-            SharedPreferencesManager.getLanguageOfNews(requireContext()),
-            SharedPreferencesManager.getCountryOfNews(requireContext())
+           lang= SharedPreferencesManager.getLanguageOfNews(requireContext()),
+           countryCode= SharedPreferencesManager.getCountryOfNews(requireContext())
         )
     }
 

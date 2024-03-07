@@ -27,6 +27,8 @@ class ChooseLangActivity : AppCompatActivity(), OnItemSelectedListener {
         setContentView(binding.root)
 
         setUpAdapter()
+        binding.langSpinner.onItemSelectedListener = this
+
 
 
 
@@ -64,7 +66,7 @@ class ChooseLangActivity : AppCompatActivity(), OnItemSelectedListener {
 
         val selectedCode =
             Constants.allSupportLanguagesOfNews[selectedLanguageFromPosition] as String
-        Toast.makeText(this,"lang :${selectedLanguageFromPosition}", Toast.LENGTH_SHORT).show()
+
         SharedPreferencesManager.saveLanguageOfNews(this, selectedCode)
     }
 

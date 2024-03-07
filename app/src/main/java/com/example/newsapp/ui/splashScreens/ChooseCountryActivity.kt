@@ -68,6 +68,7 @@ class ChooseCountryActivity : AppCompatActivity(), OnItemSelectedListener {
 
         val selectedCode =
             Constants.allSupportCountriesOfNews[selectedCountryFromPosition] as String
+
         SharedPreferencesManager.saveCountryOfNews(this, selectedCode)
 
     }
