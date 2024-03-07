@@ -27,6 +27,8 @@ class Constants {
         val allSupportCountriesOfNews = mapOf(
             "countries: " to "",
             "Egypt" to "eg",
+            "United Kingdom" to "gb",
+            "United States" to "us",
             "Australia" to "au",
             "Brazil" to "br",
             "Canada" to "ca",
@@ -46,9 +48,7 @@ class Constants {
             "Russian Federation" to "ru",
             "Singapore" to "sg",
             "Spain" to "es",
-            "Sweden" to "se",
-            "United Kingdom" to "gb",
-            "United States" to "us"
+            "Sweden" to "se"
         )
 
     }

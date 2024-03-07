@@ -10,4 +10,9 @@
     <string name="choose_category_of_news">اختر المجال الذي تريده للأخبار</string>
     <string name="choose_lang_of_news">اختر اللغة التي تريدها للأخبار</string>
     <string name="see_all">رؤية الكل</string>
+    <string name="breaking_news" >اخر واهم الاخبار</string>
+    <string name="home">الرئيسية</string>
+    <string name="saved_news">الاخبار المحفوظة</string>
+    <string name="search_news">بحث الاخبار</string>
+    <string name="settings">الاعدادات</string>
 </resources>

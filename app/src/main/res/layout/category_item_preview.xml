@@ -10,8 +10,8 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/category_card"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="185dp"
+        android:layout_height="185dp"
         style="@style/CARD_VIEW"
         app:cardCornerRadius="10dp"
         android:clickable="true"

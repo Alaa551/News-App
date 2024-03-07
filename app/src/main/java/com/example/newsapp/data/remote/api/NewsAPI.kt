@@ -19,7 +19,7 @@ interface NewsAPI {
         countryCode: String = "us",
 
         @Query("max")
-        maxResults: Int = 10,
+        maxResults: Int = 50,
 
         @Query("apikey")
         apiKey: String = API_KEY
