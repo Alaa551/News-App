@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:text="@string/choose_category_of_news"
+        android:text="@string/choose_country_of_news"
         style="@style/TEXT"
         android:textSize="25sp"
         app:layout_constraintBottom_toTopOf="@id/cardView_country"

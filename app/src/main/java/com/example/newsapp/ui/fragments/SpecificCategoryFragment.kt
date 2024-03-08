@@ -86,7 +86,7 @@ class SpecificCategoryFragment : BaseFragment<NewsViewModel>(), OnArticleClickLi
         }
 
         findNavController().navigate(
-            R.id.action_breakingNewsFragment_to_articleFragment, bundle
+            R.id.action_specificCategoryFragment_to_articleFragment, bundle
         )
     }
 
