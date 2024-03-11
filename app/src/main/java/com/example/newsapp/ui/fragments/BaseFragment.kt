@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.newsapp.data.local.ArticleDatabase
 import com.example.newsapp.repository.NewsRepository
 
-abstract class BaseFragment<VM : ViewModel>() : Fragment() {
+abstract class BaseFragment<VM : ViewModel> : Fragment() {
 
     abstract fun getViewModelClass(): Class<VM>
 

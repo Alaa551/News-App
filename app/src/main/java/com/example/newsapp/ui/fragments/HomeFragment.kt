@@ -60,25 +60,48 @@ class HomeFragment : BaseFragment<NewsViewModel>(), OnCategoryClickListener ,OnA
         setUpRecyclerView()
         showShimmer()
 
-        viewModel.breakingNews.observe(viewLifecycleOwner, Observer { response -> //
-            when (response) {
-                is Resource.Success -> {
-                   hideShimmer()
-                    response.data?.let { newsResponse ->
-                        newsAdapter.oldArticles = newsResponse.articles
-                    }
-                }
 
-                is Resource.Error -> {
-                    hideShimmer()
-                    response.message?.let { message ->
-                        Snackbar.make(view,"An error occurred: $message", Snackbar.LENGTH_SHORT).show()
-                    }
-                }
+        viewModel.isOnline.observe(viewLifecycleOwner, Observer {
+            if(it==true){
+                hideNoInternetAnim()
+                viewModel.getBreakingNews(
+                    SharedPreferencesManager.getCountryOfNews(requireContext()),
+                    SharedPreferencesManager.getLanguageOfNews(requireContext())
+                )
+                viewModel.breakingNews.observe(viewLifecycleOwner, Observer { response -> //
+                    when (response) {
+                        is Resource.Success -> {
+                            hideShimmer()
+                            response.data?.let { newsResponse ->
+                                newsAdapter.oldArticles = newsResponse.articles
+                            }
+                        }
 
-                is Resource.Loading -> {
-                    showShimmer()
-                }
+                        is Resource.Error -> {
+                            hideShimmer()
+                            response.message?.let { message ->
+
+                                    Snackbar.make(
+                                        view,
+                                        "An error occurred: $message",
+                                        Snackbar.LENGTH_SHORT
+                                    )
+                                        .show()
+                            }
+                        }
+
+                        is Resource.Loading -> {
+                            showShimmer()
+
+                        }
+                    }
+                })
+
+            }
+            else{
+                hideShimmer()
+                setUpRecyclerView()
+                showNoInternetAnim()
             }
         })
 
@@ -88,6 +111,15 @@ class HomeFragment : BaseFragment<NewsViewModel>(), OnCategoryClickListener ,OnA
         }
     }
 
+    fun showNoInternetAnim() {
+        binding.noInternetAnim.visibility = View.VISIBLE
+        binding.noInternetAnim.playAnimation()
+    }
+
+    fun hideNoInternetAnim() {
+        binding.noInternetAnim.cancelAnimation()
+        binding.noInternetAnim.visibility = View.GONE
+    }
 
     private fun setUpCategoriesRecyclerView(categories: List<Category>) {
         categoriesAdapter = CategoriesAdapter(categories, this)

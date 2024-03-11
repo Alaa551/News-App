@@ -1,5 +1,6 @@
 package com.example.newsapp.viewModel
 
+import ConnectivityRepository
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
@@ -7,6 +8,7 @@ import android.net.ConnectivityManager.*
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.NewsApplication
@@ -23,8 +25,8 @@ import java.io.IOException
 class NewsViewModel(
     app: Application,
     private val newsRepository: NewsRepository,
-    val lang:String,
-    val countryCode: String
+    val lang: String,
+    val countryCode: String,
 ) : AndroidViewModel(app) {
 
     val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
@@ -42,27 +44,30 @@ class NewsViewModel(
     val categoryNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
 
 
+    val isOnline: LiveData<Boolean> =
+        ConnectivityRepository(getApplication<NewsApplication>()).isOnline
+
 
     init {
-        getBreakingNews(countryCode,lang)
+        //getBreakingNews(countryCode, lang)
     }
 
 
-    public fun getBreakingNews(countryCode: String,lang:String) =
+    fun getBreakingNews(countryCode: String, lang: String) =
         viewModelScope.launch {
-           safeBreakingNewsCall(countryCode,lang)
+            safeBreakingNewsCall(countryCode, lang)
 
         }
 
-     fun getCategoryNews(countryCode: String,lang:String,category: String) =
+    fun getCategoryNews(countryCode: String, lang: String, category: String) =
         viewModelScope.launch {
-            safeCategoryNewsCall(countryCode,lang,category)
+            safeCategoryNewsCall(countryCode, lang, category)
 
         }
 
     private fun handlingBreakingNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
         if (response.isSuccessful) {
-            response.body()?.let { newsResponse->
+            response.body()?.let { newsResponse ->
 
                 return Resource.Success(newsResponse)
             }
@@ -72,14 +77,14 @@ class NewsViewModel(
     }
 
 
-    fun searchNews(searchQuery: String,lang: String) =
+    fun searchNews(searchQuery: String, lang: String) =
         viewModelScope.launch {
-            safeSearchNewsCall(searchQuery,lang)
+            safeSearchNewsCall(searchQuery, lang)
         }
 
     private fun handlingSearchNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
         if (response.isSuccessful) {
-            response.body()?.let { newsResponse->
+            response.body()?.let { newsResponse ->
 
                 return Resource.Success(newsResponse)
             }
@@ -87,23 +92,19 @@ class NewsViewModel(
         return Resource.Error(response.message())
 
     }
-
-
 
 
     private suspend fun safeBreakingNewsCall(countryCode: String, lang: String) {
         breakingNews.postValue(Resource.Loading())
 
         try {
-            if(checkForInternet()) {
-                val response = newsRepository.getBreakingNews(countryCode, breakingNewsPages, lang = lang)
+            val response =
+                newsRepository.getBreakingNews(countryCode, breakingNewsPages, lang = lang)
 
-                breakingNews.postValue(handlingBreakingNewsResponse(response))
-            } else{
-                breakingNews.postValue(Resource.Error("No Internet Connection"))
-            }
-        }catch (t:Throwable){
-            when(t){
+            breakingNews.postValue(handlingBreakingNewsResponse(response))
+
+        } catch (t: Throwable) {
+            when (t) {
                 is IOException -> breakingNews.postValue(Resource.Error("Network Failure"))
                 else -> breakingNews.postValue(Resource.Error("Conversion Error"))
 
@@ -111,19 +112,24 @@ class NewsViewModel(
         }
     }
 
-    private suspend fun safeCategoryNewsCall(countryCode: String, lang: String,category: String) {
+    private suspend fun safeCategoryNewsCall(countryCode: String, lang: String, category: String) {
         categoryNews.postValue(Resource.Loading())
 
         try {
-            if(checkForInternet()) {
-                val response = newsRepository.getCategoryNews(countryCode, breakingNewsPages, lang = lang, category = category)
+            if (checkForInternet()) {
+                val response = newsRepository.getCategoryNews(
+                    countryCode,
+                    breakingNewsPages,
+                    lang = lang,
+                    category = category
+                )
 
                 categoryNews.postValue(handlingBreakingNewsResponse(response))
-            } else{
+            } else {
                 categoryNews.postValue(Resource.Error("No Internet Connection"))
             }
-        }catch (t:Throwable){
-            when(t){
+        } catch (t: Throwable) {
+            when (t) {
                 is IOException -> categoryNews.postValue(Resource.Error("Network Failure"))
                 else -> categoryNews.postValue(Resource.Error("Conversion Error"))
 
@@ -131,19 +137,16 @@ class NewsViewModel(
         }
     }
 
-    private suspend fun safeSearchNewsCall(searchQuery: String,lang: String) {
+    private suspend fun safeSearchNewsCall(searchQuery: String, lang: String) {
         searchNews.postValue(Resource.Loading())
 
         try {
-            if(checkForInternet()) {
-                val response = newsRepository.searchNews(searchQuery, searchNewsPages,lang)
+            val response = newsRepository.searchNews(searchQuery, searchNewsPages, lang)
 
-                searchNews.postValue(handlingSearchNewsResponse(response))
-            } else{
-                searchNews.postValue(Resource.Error("No Internet Connection"))
-            }
-        }catch (t:Throwable){
-            when(t){
+            searchNews.postValue(handlingSearchNewsResponse(response))
+
+        } catch (t: Throwable) {
+            when (t) {
                 is IOException -> searchNews.postValue(Resource.Error("Network Failure"))
                 else -> searchNews.postValue(Resource.Error("Conversion Error"))
 
@@ -151,7 +154,7 @@ class NewsViewModel(
         }
     }
 
-    private fun checkForInternet(): Boolean {
+    fun checkForInternet(): Boolean {
 
         // register activity with the connectivity manager service
         val connectivityManager =
@@ -187,7 +190,6 @@ class NewsViewModel(
         }
         return false
     }
-
 
 
     fun savaArticle(article: Article) = viewModelScope.launch {

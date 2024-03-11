@@ -29,7 +29,6 @@ class SpecificCategoryFragment : BaseFragment<NewsViewModel>(), OnArticleClickLi
     private lateinit var newsAdapter: NewsAdapter
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,88 +44,113 @@ class SpecificCategoryFragment : BaseFragment<NewsViewModel>(), OnArticleClickLi
         setUpRecyclerView()
         showShimmer()
 
-        binding.categoryName.text= args.categoryName
+        binding.categoryName.text = args.categoryName
 
-        viewModel.getCategoryNews(
-            SharedPreferencesManager.getCountryOfNews(requireContext()),
-            SharedPreferencesManager.getLanguageOfNews(requireContext()),
-            category = args.categoryName
-        )
 
-        viewModel.categoryNews.observe(viewLifecycleOwner, Observer { response ->
 
-            when (response) {
-                is Resource.Success -> {
-                    hideShimmer()
-                    response.data?.let { newsResponse ->
-                        newsAdapter.oldArticles = newsResponse.articles
+
+        viewModel.isOnline.observe(viewLifecycleOwner, Observer {
+            if (it == true) {
+                hideNoInternetAnim()
+                viewModel.getCategoryNews(
+                    SharedPreferencesManager.getCountryOfNews(requireContext()),
+                    SharedPreferencesManager.getLanguageOfNews(requireContext()),
+                    category = args.categoryName
+                )
+                viewModel.categoryNews.observe(viewLifecycleOwner, Observer { response ->
+
+                    when (response) {
+                        is Resource.Success -> {
+                            hideShimmer()
+                            response.data?.let { newsResponse ->
+                                newsAdapter.oldArticles = newsResponse.articles
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            hideShimmer()
+                            response.message?.let { message ->
+                                Snackbar.make(
+                                    view,
+                                    "An error occurred: $message",
+                                    Snackbar.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+                        }
+
+                        is Resource.Loading -> {
+                            showShimmer()
+                        }
                     }
-                }
+                })
 
-                is Resource.Error -> {
-                    hideShimmer()
-                    response.message?.let { message ->
-                        Snackbar.make(view, "An error occurred: $message", Snackbar.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-
-                is Resource.Loading -> {
-                    showShimmer()
-                }
+            } else {
+                hideShimmer()
+                setUpRecyclerView()
+                showNoInternetAnim()
             }
         })
-
-
-    }
-
-    override fun onItemClick(article: Article) {
-        val bundle = Bundle().apply {
-            putSerializable("article", article)
-        }
-
-        findNavController().navigate(
-            R.id.action_specificCategoryFragment_to_articleFragment, bundle
-        )
     }
 
 
-    private fun hideShimmer() {
-        binding.shimmerLayout.stopShimmer()
-        binding.shimmerLayout.visibility = View.GONE
-        binding.rvBreakingNews.visibility = View.VISIBLE
 
+override fun onItemClick(article: Article) {
+    val bundle = Bundle().apply {
+        putSerializable("article", article)
     }
 
+    findNavController().navigate(
+        R.id.action_specificCategoryFragment_to_articleFragment, bundle
+    )
+}
 
-    private fun showShimmer() {
-        binding.shimmerLayout.startShimmer()
 
+private fun hideShimmer() {
+    binding.shimmerLayout.stopShimmer()
+    binding.shimmerLayout.visibility = View.GONE
+    binding.rvBreakingNews.visibility = View.VISIBLE
+
+}
+
+fun showNoInternetAnim() {
+    binding.noInternetAnim.visibility = View.VISIBLE
+    binding.noInternetAnim.playAnimation()
+}
+
+fun hideNoInternetAnim() {
+    binding.noInternetAnim.cancelAnimation()
+    binding.noInternetAnim.visibility = View.GONE
+}
+
+private fun showShimmer() {
+    binding.shimmerLayout.startShimmer()
+
+}
+
+private fun setUpRecyclerView() {
+    newsAdapter = NewsAdapter(this)
+    binding.rvBreakingNews.apply {
+        adapter = newsAdapter
+        layoutManager = LinearLayoutManager(requireContext()) //
     }
 
-    private fun setUpRecyclerView() {
-        newsAdapter = NewsAdapter(this)
-        binding.rvBreakingNews.apply {
-            adapter = newsAdapter
-            layoutManager = LinearLayoutManager(requireContext()) //
-        }
+}
 
-    }
+override fun getViewModelClass(): Class<NewsViewModel> {
+    return NewsViewModel::class.java
+}
 
-    override fun getViewModelClass(): Class<NewsViewModel> {
-        return NewsViewModel::class.java
-    }
+override fun getViewModelFactory(): ViewModelProvider.Factory {
+    val newsRepository = NewsRepository(ArticleDatabase(requireContext()))
 
-    override fun getViewModelFactory(): ViewModelProvider.Factory {
-        val newsRepository = NewsRepository(ArticleDatabase(requireContext()))
-
-        return NewViewModelProviderFactory(
-            requireActivity().application,
-            newsRepository,
-            SharedPreferencesManager.getLanguageOfNews(requireContext()),
-            SharedPreferencesManager.getCountryOfNews(requireContext())
-        )
-    }
+    return NewViewModelProviderFactory(
+        requireActivity().application,
+        newsRepository,
+        SharedPreferencesManager.getLanguageOfNews(requireContext()),
+        SharedPreferencesManager.getCountryOfNews(requireContext())
+    )
+}
 
 
 }

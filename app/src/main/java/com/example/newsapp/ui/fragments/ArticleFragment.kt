@@ -57,7 +57,7 @@ class ArticleFragment : BaseFragment<NewsViewModel>() {
     }
 
     override fun getViewModelFactory(): ViewModelProvider.Factory {
-        val newsRepository = NewsRepository(ArticleDatabase(requireContext()) as ArticleDatabase)
+        val newsRepository = NewsRepository(ArticleDatabase(requireContext()))
 
 
         return NewViewModelProviderFactory(

@@ -91,7 +91,7 @@ class SavedNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListener 
     }
 
     override fun getViewModelFactory(): ViewModelProvider.Factory {
-        val newsRepository = NewsRepository(ArticleDatabase(requireContext()) as ArticleDatabase)
+        val newsRepository = NewsRepository(ArticleDatabase(requireContext()))
 
         return NewViewModelProviderFactory(
             requireActivity().application,

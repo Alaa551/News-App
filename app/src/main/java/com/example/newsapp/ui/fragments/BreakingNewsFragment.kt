@@ -1,5 +1,6 @@
 package com.example.newsapp.ui.fragments
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,7 @@ import com.google.android.material.snackbar.Snackbar
 class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListener {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var binding: FragmentBreakingNewsBinding
-    private lateinit var scrollListener:RecyclerView.OnScrollListener
+    private lateinit var scrollListener: RecyclerView.OnScrollListener
     private val TAG = "BreakingNewsFragment"
 
     override fun onCreateView(
@@ -44,29 +45,51 @@ class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListen
         setUpRecyclerView(binding.rvBreakingNews)
         showShimmer()
 
-        viewModel.breakingNews.observe(viewLifecycleOwner, Observer { response -> //
-            when (response) {
-                is Resource.Success -> {
-                    hideShimmer()
-                    response.data?.let { newsResponse ->
-                        newsAdapter.oldArticles = newsResponse.articles
-                    }
-                }
 
-                is Resource.Error -> {
-                    hideShimmer()
-                    response.message?.let { message ->
-                        Snackbar.make(view, "An error occurred: $message", Snackbar.LENGTH_SHORT)
-                            .show()
-                    }
-                }
 
-                is Resource.Loading -> {
-                    showShimmer()
-                }
+        viewModel.isOnline.observe(viewLifecycleOwner, Observer {
+            if(it==true){
+                hideNoInternetAnim()
+                viewModel.getBreakingNews(
+                    SharedPreferencesManager.getCountryOfNews(requireContext()),
+                    SharedPreferencesManager.getLanguageOfNews(requireContext())
+                )
+                viewModel.breakingNews.observe(viewLifecycleOwner, Observer { response -> //
+                    when (response) {
+                        is Resource.Success -> {
+                            hideShimmer()
+                            response.data?.let { newsResponse ->
+                                newsAdapter.oldArticles = newsResponse.articles
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            hideShimmer()
+                            response.message?.let { message ->
+
+                                Snackbar.make(
+                                    view,
+                                    "An error occurred: $message",
+                                    Snackbar.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+                        }
+
+                        is Resource.Loading -> {
+                            showShimmer()
+
+                        }
+                    }
+                })
+
             }
-        })
-    }
+            else{
+                hideShimmer()
+                setUpRecyclerView(binding.rvBreakingNews)
+                showNoInternetAnim()
+            }
+        })    }
 
     private fun hideShimmer() {
         binding.shimmerLayout.stopShimmer()
@@ -76,6 +99,15 @@ class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListen
 
     }
 
+    fun showNoInternetAnim() {
+        binding.noInternetAnim.visibility = View.VISIBLE
+        binding.noInternetAnim.playAnimation()
+    }
+
+    fun hideNoInternetAnim() {
+        binding.noInternetAnim.cancelAnimation()
+        binding.noInternetAnim.visibility = View.GONE
+    }
 
     private fun showShimmer() {
         binding.shimmerLayout.startShimmer()
@@ -102,8 +134,8 @@ class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListen
         return NewViewModelProviderFactory(
             requireActivity().application,
             newsRepository,
-           lang= SharedPreferencesManager.getLanguageOfNews(requireContext()),
-           countryCode= SharedPreferencesManager.getCountryOfNews(requireContext())
+            lang = SharedPreferencesManager.getLanguageOfNews(requireContext()),
+            countryCode = SharedPreferencesManager.getCountryOfNews(requireContext())
         )
     }
 
@@ -118,48 +150,5 @@ class BreakingNewsFragment : BaseFragment<NewsViewModel>(), OnArticleClickListen
         )
     }
 
-//
-//    fun handlePagination(){
-//        var isLoading= false
-//        var isLastPage= false
-//        var isScrolling= false
-//
-//         scrollListener= object : RecyclerView.OnScrollListener(){
-//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                super.onScrollStateChanged(recyclerView, newState)
-//                if(newState== AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
-//                    isScrolling=true
-//
-//            }
-//
-//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-//                super.onScrolled(recyclerView, dx, dy)
-//
-//                val layoutManager= binding.rvBreakingNews.layoutManager as LinearLayoutManager
-//                val firsVisibleItemPosition= layoutManager.findFirstVisibleItemPosition()
-//                val visibleItemCount= layoutManager.childCount
-//                val totalItemCount=layoutManager.itemCount
-//
-//
-//                val isNotLoadingAndNotLastPage= !isLoading && !isLastPage
-//                val isLastItem= firsVisibleItemPosition+visibleItemCount >= totalItemCount
-//                val isNotAtBeginning= firsVisibleItemPosition >=0
-//                val isTotalMoreThanVisible= totalItemCount >= QUERY_PAGE_SIZE
-//
-//                val shouldPaginate= isNotAtBeginning && isLastItem && isNotLoadingAndNotLastPage
-//                        && isTotalMoreThanVisible && isScrolling
-//
-//                if(shouldPaginate){
-//                    viewModel.getBreakingNews(
-//                        countryCode =  SharedPreferencesManager.getLanguageOfNews(requireContext()),
-//                       lang = SharedPreferencesManager.getCountryOfNews(requireContext())
-//                    )
-//
-//                    isScrolling=false
-//
-//                }
-//            }
-//        }
-//    }
 
 }

@@ -38,7 +38,7 @@ class NewsActivity : AppCompatActivity() {
 
         // setup view model
 
-        val newsRepository = NewsRepository(ArticleDatabase(this) as ArticleDatabase)
+        val newsRepository = NewsRepository(ArticleDatabase(this))
         val newViewModelProviderFactory = NewViewModelProviderFactory(
             application,
             newsRepository,
@@ -61,32 +61,7 @@ class NewsActivity : AppCompatActivity() {
         binding.bottomNav.setupWithNavController(navController)
 
 
-//        // setup toolbar
-//        // set toolbar to has only items in bottom nav
-//        appBarConfiguration = AppBarConfiguration(
-//            setOf(
-//                R.id.breakingNewsFragment,
-//                R.id.savedNewsFragment,
-//                R.id.searchNewsFragment,
-//                R.id.settingsFragment
-//            )
-//        )
-//
-//        setSupportActionBar(binding.toolbar)
-//        // it is called to link the action bar with the NavController for handling navigation actions.
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-//
-//    }
-//
-//    override fun onSupportNavigateUp(): Boolean {
-//        // this is for toolbar
-//        // This method is overridden to handle the Up button navigation in the action bar.
-//        //It returns true if the navigation controller successfully handles the navigation action,
-//        // otherwise it delegates to the superclass implementation.
-//        return navController.navigateUp() || super.onSupportNavigateUp()
-//    }
     }
-
     private fun initializeAppLanguage() {
 
 

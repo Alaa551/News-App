@@ -46,14 +46,14 @@ class ModeFragment : Fragment() {
 
         binding.radioButtonDark.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 SharedPreferencesManager.saveThemeMode(requireContext(),"Dark")
 
             }
         }
         binding.radioButtonLight.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 SharedPreferencesManager.saveThemeMode(requireContext(),"Light")
 
             }

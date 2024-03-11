@@ -57,36 +57,14 @@ class SearchNewsFragment :
             job = MainScope().launch {
                 it?.let {
                     if (it.toString().isNotEmpty()) {
-                        showShimmer()
                         viewModel.searchNews(it.toString(), SharedPreferencesManager.getLanguageOfNews(requireContext()))
                     }
                 }
             }
         }
+        handleSearch()
 
 
-
-        viewModel.searchNews.observe(viewLifecycleOwner, Observer { response -> //
-            when (response) {
-                is Resource.Success -> {
-                    hideShimmer()
-                    response.data?.let { newResponse ->
-                        newsAdapter.oldArticles = newResponse.articles
-                    }
-                }
-
-                is Resource.Error -> {
-                   hideShimmer()
-                    response.message?.let { message ->
-                        Snackbar.make(view,"An error occurred: $message", Snackbar.LENGTH_SHORT).show()
-                    }
-                }
-
-                is Resource.Loading -> {
-                    showShimmer()
-                }
-            }
-        })
 
     }
 
@@ -98,7 +76,49 @@ class SearchNewsFragment :
 
     }
 
+    fun handleSearch(){
+        viewModel.isOnline.observe(viewLifecycleOwner, Observer {
+            if(it){
+                hideNoInternetAnim()
+                viewModel.searchNews.observe(viewLifecycleOwner, Observer { response -> //
+                    when (response) {
+                        is Resource.Success -> {
+                            hideShimmer()
+                            response.data?.let { newResponse ->
+                                newsAdapter.oldArticles = newResponse.articles
+                            }
+                        }
 
+                        is Resource.Error -> {
+                            hideShimmer()
+                            response.message?.let { message ->
+                                Snackbar.make(requireView(),"An error occurred: $message", Snackbar.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        is Resource.Loading -> {
+                            showShimmer()
+                        }
+                    }
+                })
+
+            }else{
+                hideShimmer()
+                setUpRecyclerView(binding.rvSearchNews)
+                showNoInternetAnim()
+            }
+        })
+
+    }
+    fun showNoInternetAnim() {
+        binding.noInternetAnim.visibility = View.VISIBLE
+        binding.noInternetAnim.playAnimation()
+    }
+
+    fun hideNoInternetAnim() {
+        binding.noInternetAnim.cancelAnimation()
+        binding.noInternetAnim.visibility = View.GONE
+    }
     private fun showShimmer() {
         binding.shimmerLayout.visibility=View.VISIBLE
         binding.shimmerLayout.startShimmer()
@@ -119,7 +139,7 @@ class SearchNewsFragment :
     }
 
     override fun getViewModelFactory(): ViewModelProvider.Factory {
-        val newsRepository = NewsRepository(ArticleDatabase(requireContext()) as ArticleDatabase)
+        val newsRepository = NewsRepository(ArticleDatabase(requireContext()))
 
         return NewViewModelProviderFactory(
             requireActivity().application,
